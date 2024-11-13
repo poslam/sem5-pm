@@ -1,6 +1,7 @@
 #include "esp_common.h"
 #include "gpio.h"
 #include "freertos/task.h"
+#include "math.h"
 
 #define UART_BAUD_RATE 9600
 
@@ -56,26 +57,71 @@ void delay(int ms)
     vTaskDelay(ms / portTICK_RATE_MS);
 }
 
-#include <math.h>
+struct BlinkParams
+{
+    uint32 start;
+    uint32 channel_id;
+    uint32 end;
+    uint32 delay_time;
+    uint32 duration;
+};
+
+void blink_task(void *pvParameters)
+{
+    struct BlinkParams params = *(struct BlinkParams *)pvParameters;
+    ;
+
+    int step = floor(
+        (params.end - params.start) /
+        (params.duration / params.delay_time));
+    int now = params.start;
+
+    while (1)
+    {
+        while (now < params.end)
+        {
+            pwm_set_duty(now, params.channel_id);
+            pwm_start();
+            delay(params.delay_time);
+            now += step;
+
+            printf("+ Duty: %d\n", now);
+        }
+
+        while (now > params.start)
+        {
+            pwm_set_duty(now, params.channel_id);
+            pwm_start();
+            delay(params.delay_time);
+            now -= step;
+
+            printf("- Duty: %d\n", now);
+        }
+    }
+}
+
+struct BlinkParams params = {
+    .start = 50,
+    .channel_id = 0,
+    .end = 500,
+    .delay_time = 50,
+    .duration = 500,
+};
 
 void user_init(void)
 {
     init_uart();
     init_pwm();
 
-    GPIO_AS_OUTPUT(GPIO_Pin_5);
+    // gpio_enable(GPIO_Pin_5);
 
-    int start = 10;
-    int end = 1023;
-    int steps = 100;
+    GPIO_AS_INPUT(GPIO_Pin_5);
 
-    int step = floor((end - start) / steps);
-
-    while (1) {
-
-        for (int i = 0; i < steps; i++) {
-            pwm_set_duty(0, 0);
-            delay(10);
-        }
+    // xTaskCreate(&blink_task, "blink_task_1", 2048, (void *)&params, 1, NULL);
+    
+    while (1)
+    {
+        // printf("asd\n");
+        delay(100);
     }
 }
