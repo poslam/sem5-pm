@@ -2,126 +2,128 @@
 #include "gpio.h"
 #include "freertos/task.h"
 #include "math.h"
+#include "init.h"
 
-#define UART_BAUD_RATE 9600
-
-void init_uart()
+struct BlinkParams
 {
-    UART_SetBaudrate(0, UART_BAUD_RATE);
-}
+    uint32 channel_id;
+    uint32 start;
+    uint32 end;
+    uint32 delay_time;
+    uint32 duration;
+};
 
-void init_pwm()
-{
-    uint32 io_info[][3] = {
-        {PERIPHS_IO_MUX_MTDI_U, FUNC_GPIO5, 5},
-    };
+int long_duration = 2000;
+int short_duration = 500;
 
-    u32 dutys[] = {0};
-    pwm_init(1000, dutys, 1, io_info);
-}
-
-uint32 user_rf_cal_sector_set(void)
-{
-    flash_size_map size_map = system_get_flash_size_map();
-    uint32 rf_cal_sec = 0;
-    switch (size_map)
-    {
-    case FLASH_SIZE_4M_MAP_256_256:
-        rf_cal_sec = 128 - 5;
-        break;
-
-    case FLASH_SIZE_8M_MAP_512_512:
-        rf_cal_sec = 256 - 5;
-        break;
-
-    case FLASH_SIZE_16M_MAP_512_512:
-    case FLASH_SIZE_16M_MAP_1024_1024:
-        rf_cal_sec = 512 - 5;
-        break;
-
-    case FLASH_SIZE_32M_MAP_512_512:
-    case FLASH_SIZE_32M_MAP_1024_1024:
-        rf_cal_sec = 1024 - 5;
-        break;
-
-    default:
-        rf_cal_sec = 0;
-        break;
-    }
-
-    return rf_cal_sec;
-}
+struct BlinkParams params = {
+    .start = 0,
+    .channel_id = 0,
+    .end = 1023,
+    .delay_time = 50,
+    .duration = 500,
+};
 
 void delay(int ms)
 {
     vTaskDelay(ms / portTICK_RATE_MS);
 }
 
-struct BlinkParams
-{
-    uint32 start;
-    uint32 channel_id;
-    uint32 end;
-    uint32 delay_time;
-    uint32 duration;
-};
-
 void blink_task(void *pvParameters)
 {
-    struct BlinkParams params = *(struct BlinkParams *)pvParameters;
-    ;
+    struct BlinkParams *params = (struct BlinkParams *)pvParameters;
+    int now = params->start;
 
-    int step = floor(
-        (params.end - params.start) /
-        (params.duration / params.delay_time));
-    int now = params.start;
+    int channel_id;
+    int start;
+    int end;
+    int delay_time;
+    int duration;
 
     while (1)
     {
-        while (now < params.end)
-        {
-            pwm_set_duty(now, params.channel_id);
-            pwm_start();
-            delay(params.delay_time);
-            now += step;
+        channel_id = params->channel_id;
+        start = params->start;
+        end = params->end;
+        delay_time = params->delay_time;
+        duration = params->duration;
 
-            printf("+ Duty: %d\n", now);
+        int step = floor(2 * (end - start) / (duration / delay_time));
+
+        while (now < end)
+        {
+            pwm_set_duty(now, channel_id);
+            pwm_start();
+            delay(delay_time);
+            now += step;
         }
 
-        while (now > params.start)
+        while (now > start)
         {
-            pwm_set_duty(now, params.channel_id);
+            pwm_set_duty(now, channel_id);
             pwm_start();
-            delay(params.delay_time);
+            delay(delay_time);
             now -= step;
-
-            printf("- Duty: %d\n", now);
         }
     }
 }
 
-struct BlinkParams params = {
-    .start = 50,
-    .channel_id = 0,
-    .end = 500,
-    .delay_time = 50,
-    .duration = 500,
-};
+void button_down(bool is_long, uint32_t gpio_status_last, uint32_t gpio_status)
+{
+    if (is_long)
+    {
+        is_long = false;
+    }
+    else
+    {
+        if (params.duration == long_duration)
+            params.duration = short_duration;
+        else
+            params.duration = long_duration;
+        is_long = true;
+    }
+    gpio_status_last = gpio_status;
+    printf("button down");
+}
+
+void button_up()
+{
+    printf("button up");
+}
+
+void button_daemon()
+{
+    // 0 - pressed, 16 - released
+
+    uint32_t gpio_status_last = gpio_input_get() & inp_bit_1;
+    bool is_long = false;
+
+    while (1)
+    {
+        uint32_t gpio_status = gpio_input_get() & inp_bit_1;
+
+        if (gpio_status_last != 0 && gpio_status == 0)
+            button_down(is_long, gpio_status_last, gpio_status);
+
+        else if (gpio_status_last == 0 && gpio_status != 0)
+            button_up();
+
+        gpio_status_last = gpio_status;
+        delay(100);
+    }
+}
 
 void user_init(void)
 {
     init_uart();
     init_pwm();
+    init_inp();
 
-    // gpio_enable(GPIO_Pin_5);
+    xTaskCreate(&button_daemon, "button_daemon", 2048, NULL, 1, NULL);
+    xTaskCreate(&blink_task, "blink_task_1", 2048, (void *)&params, 1, NULL);
 
-    GPIO_AS_INPUT(GPIO_Pin_5);
-
-    // xTaskCreate(&blink_task, "blink_task_1", 2048, (void *)&params, 1, NULL);
-    
-    while (1)
-    {
-        // printf("asd\n");
-        delay(100);
-    }
+    // while (1)
+    // {
+    //     delay(100);
+    // }
 }

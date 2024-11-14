@@ -1,5 +1,7 @@
 {
     "files.associations": {
-        "gpio.h": "c"
+        "gpio.h": "c",
+        "init.h": "c",
+        "task.h": "c"
     }
 }
