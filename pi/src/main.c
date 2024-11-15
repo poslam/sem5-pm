@@ -24,6 +24,30 @@ struct BlinkParams params = {
     .duration = 500,
 };
 
+struct BlinkParams params2 = {
+    .start = 0,
+    .channel_id = 1,
+    .end = 1023,
+    .delay_time = 50,
+    .duration = 1000,
+};
+
+struct BlinkParams params3 = {
+    .start = 0,
+    .channel_id = 2,
+    .end = 1023,
+    .delay_time = 50,
+    .duration = 2000,
+};
+
+struct BlinkParams params4 = {
+    .start = 0,
+    .channel_id = 3,
+    .end = 1023,
+    .delay_time = 50,
+    .duration = 3000,
+};
+
 void delay(int ms)
 {
     vTaskDelay(ms / portTICK_RATE_MS);
@@ -42,6 +66,7 @@ void blink_task(void *pvParameters)
 
     while (1)
     {
+        printf("blink_task\n");
         channel_id = params->channel_id;
         start = params->start;
         end = params->end;
@@ -83,12 +108,12 @@ void button_down(bool is_long, uint32_t gpio_status_last, uint32_t gpio_status)
         is_long = true;
     }
     gpio_status_last = gpio_status;
-    printf("button down");
+    printf("button down\n");
 }
 
 void button_up()
 {
-    printf("button up");
+    printf("button up\n");
 }
 
 void button_daemon()
@@ -120,7 +145,10 @@ void user_init(void)
     init_inp();
 
     xTaskCreate(&button_daemon, "button_daemon", 2048, NULL, 1, NULL);
-    xTaskCreate(&blink_task, "blink_task_1", 2048, (void *)&params, 1, NULL);
+    xTaskCreate(&blink_task, "blink_task_1", 2048, (void *)&params, 2, NULL);
+    // xTaskCreate(&blink_task, "blink_task_2", 2048, (void *)&params2, 2, NULL);
+    // xTaskCreate(&blink_task, "blink_task_3", 2048, (void *)&params3, 3, NULL);
+    // xTaskCreate(&blink_task, "blink_task_4", 2048, (void *)&params4, 4, NULL);
 
     // while (1)
     // {

@@ -3,8 +3,24 @@
 
 #define UART_BAUD_RATE 9600
 
-#define inp_pin_1 GPIO_Pin_4
-#define inp_bit_1 BIT4 // number after BIT == GPIO_Pin number
+#define out_pin_1 GPIO_Pin_4
+#define out_pin_func_1 FUNC_GPIO4
+#define out_pin_index_1 4
+
+// #define out_pin_2 GPIO_Pin_2
+// #define out_pin_func_2 FUNC_GPIO2
+// #define out_pin_index_2 2
+
+// #define out_pin_3 GPIO_Pin_12
+// #define out_pin_func_3 FUNC_GPIO12
+// #define out_pin_index_3 12
+
+// #define out_pin_4 GPIO_Pin_16
+// #define out_pin_func_4 FUNC_GPIO16
+// #define out_pin_index_4 16
+
+#define inp_pin_1 GPIO_Pin_5
+#define inp_bit_1 BIT5 // number after BIT == GPIO_Pin number
 
 void init_uart()
 {
@@ -14,7 +30,10 @@ void init_uart()
 void init_pwm()
 {
     uint32 io_info[][3] = {
-        {PERIPHS_IO_MUX_MTDI_U, FUNC_GPIO5, 5},
+        {PERIPHS_IO_MUX_MTDI_U, out_pin_func_1, out_pin_index_1},
+        // {PERIPHS_IO_MUX_MTDI_U, out_pin_func_2, out_pin_index_2},
+        // {PERIPHS_IO_MUX_MTDI_U, out_pin_func_3, out_pin_index_3},
+        // {PERIPHS_IO_MUX_MTDI_U, out_pin_func_4, out_pin_index_4},
     };
 
     u32 dutys[] = {0};
