@@ -2,6 +2,8 @@
     "files.associations": {
         "gpio.h": "c",
         "init.h": "c",
-        "task.h": "c"
-    }
+        "task.h": "c",
+        "type_traits": "cpp"
+    },
+    "C_Cpp.errorSquiggles": "disabled"
 }
