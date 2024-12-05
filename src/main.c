@@ -136,7 +136,7 @@ void user_init(void)
     init_pwm();
     init_inp();
 
-    xTaskCreate(&button_daemon, "button_daemon", 512, NULL, 1, NULL);
+    xTaskCreate(&button_daemon, "button_daemon", 256, NULL, 1, NULL);
     xTaskCreate(&blink_daemon, "blink_daemon", 1024, NULL, 2, NULL);
 
     // int channel_id = 0;

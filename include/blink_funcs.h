@@ -103,10 +103,10 @@ void stop_blink_tasks()
 
 void create_blink_tasks()
 {
-    xTaskCreate(&blink_task, "blink_task_1", 1024, (void *)&params1, 3, &blink_1_handle);
-    xTaskCreate(&blink_task, "blink_task_2", 1024, (void *)&params2, 3, &blink_2_handle);
-    xTaskCreate(&blink_task, "blink_task_3", 1024, (void *)&params3, 3, &blink_3_handle);
-    xTaskCreate(&blink_task, "blink_task_4", 1024, (void *)&params4, 3, &blink_4_handle);
+    xTaskCreate(&blink_task, "blink_task_1", 128, (void *)&params1, 3, &blink_1_handle);
+    xTaskCreate(&blink_task, "blink_task_2", 128, (void *)&params2, 3, &blink_2_handle);
+    xTaskCreate(&blink_task, "blink_task_3", 128, (void *)&params3, 3, &blink_3_handle);
+    xTaskCreate(&blink_task, "blink_task_4", 128, (void *)&params4, 3, &blink_4_handle);
     stop_blink_tasks();
     set_all((int[]){0, 1, 2, 3}, 4, 0);
 }
@@ -128,7 +128,7 @@ void stop_blink_wave_task()
 
 void create_blink_wave_task()
 {
-    xTaskCreate(&blink_wave, "blink_wave", 1024, NULL, 3, &blink_wave_handle);
+    xTaskCreate(&blink_wave, "blink_wave", 128, NULL, 3, &blink_wave_handle);
     stop_blink_wave_task();
     set_all((int[]){0, 1, 2, 3}, 4, 0);
 }
