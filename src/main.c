@@ -18,9 +18,10 @@ void button_up_short()
 {
     if (is_blinking)
     {
-        params1.channel_id = (params1.channel_id + 1) % 3;
-        params2.channel_id = (params2.channel_id + 1) % 3;
-        params3.channel_id = (params3.channel_id + 1) % 3;
+        params1.channel_id = (params1.channel_id + 1) % 4;
+        params2.channel_id = (params2.channel_id + 1) % 4;
+        params3.channel_id = (params3.channel_id + 1) % 4;
+        params4.channel_id = (params4.channel_id + 1) % 4;
     }
     else if (is_waving)
     {
@@ -71,7 +72,7 @@ void button_daemon()
                 else if (is_waving)
                     stop_blink_wave_task();
 
-                set_all((int[]){0, 1, 2}, 3, 0);
+                set_all((int[]){0, 1, 2, 3}, 4, 0);
             }
             else if (time_diff > time_to_long_pressed)
                 button_up_long();
@@ -106,7 +107,7 @@ void blink_daemon()
         if (is_blinking)
         {
             stop_blink_tasks();
-            set_all((int[]){0, 1, 2}, 3, 0);
+            set_all((int[]){0, 1, 2, 3}, 4, 0);
             resume_blink_wave_task();
 
             is_blinking = false;
@@ -115,7 +116,7 @@ void blink_daemon()
         else if (is_waving)
         {
             stop_blink_wave_task();
-            set_all((int[]){0, 1, 2}, 3, 0);
+            set_all((int[]){0, 1, 2, 3}, 4, 0);
             resume_blink_tasks();
 
             is_blinking = true;
@@ -135,8 +136,8 @@ void user_init(void)
     init_pwm();
     init_inp();
 
-    xTaskCreate(&button_daemon, "button_daemon", 2048, NULL, 1, NULL);
-    xTaskCreate(&blink_daemon, "blink_daemon", 2048, NULL, 2, NULL);
+    xTaskCreate(&button_daemon, "button_daemon", 512, NULL, 1, NULL);
+    xTaskCreate(&blink_daemon, "blink_daemon", 1024, NULL, 2, NULL);
 
     // int channel_id = 0;
 

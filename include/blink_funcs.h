@@ -47,7 +47,7 @@ void blink_wave()
     {
         params_wave.channel_id = channel_id;
         blink_pwm(&params_wave);
-        channel_id = (channel_id + 1) % 3;
+        channel_id = (channel_id + 1) % 4;
     }
 }
 
@@ -97,14 +97,16 @@ void stop_blink_tasks()
     vTaskSuspend(blink_1_handle);
     vTaskSuspend(blink_2_handle);
     vTaskSuspend(blink_3_handle);
+    vTaskSuspend(blink_4_handle);
     is_blinking = false;
 }
 
 void create_blink_tasks()
 {
-    xTaskCreate(&blink_task, "blink_task_1", 2048, (void *)&params1, 3, &blink_1_handle);
-    xTaskCreate(&blink_task, "blink_task_2", 2048, (void *)&params2, 3, &blink_2_handle);
-    xTaskCreate(&blink_task, "blink_task_3", 2048, (void *)&params3, 3, &blink_3_handle);
+    xTaskCreate(&blink_task, "blink_task_1", 1024, (void *)&params1, 3, &blink_1_handle);
+    xTaskCreate(&blink_task, "blink_task_2", 1024, (void *)&params2, 3, &blink_2_handle);
+    xTaskCreate(&blink_task, "blink_task_3", 1024, (void *)&params3, 3, &blink_3_handle);
+    xTaskCreate(&blink_task, "blink_task_4", 1024, (void *)&params4, 3, &blink_4_handle);
     stop_blink_tasks();
     set_all((int[]){0, 1, 2, 3}, 4, 0);
 }
@@ -114,6 +116,7 @@ void resume_blink_tasks()
     vTaskResume(blink_1_handle);
     vTaskResume(blink_2_handle);
     vTaskResume(blink_3_handle);
+    vTaskResume(blink_4_handle);
     is_blinking = true;
 }
 
@@ -125,7 +128,7 @@ void stop_blink_wave_task()
 
 void create_blink_wave_task()
 {
-    xTaskCreate(&blink_wave, "blink_wave", 2048, NULL, 3, &blink_wave_handle);
+    xTaskCreate(&blink_wave, "blink_wave", 1024, NULL, 3, &blink_wave_handle);
     stop_blink_wave_task();
     set_all((int[]){0, 1, 2, 3}, 4, 0);
 }

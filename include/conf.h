@@ -19,7 +19,7 @@ xTaskHandle blink_4_handle;
 struct BlinkParams params1 = {
     .start = 0,
     .channel_id = 0,
-    .end = 300,
+    .end = 1000,
     .delay_time = 100,
     .duration = 1000,
     .is_pwm = false,
@@ -28,7 +28,7 @@ struct BlinkParams params1 = {
 struct BlinkParams params2 = {
     .start = 0,
     .channel_id = 1,
-    .end = 300,
+    .end = 1000,
     .delay_time = 50,
     .duration = 500,
     .is_pwm = true,
@@ -37,10 +37,19 @@ struct BlinkParams params2 = {
 struct BlinkParams params3 = {
     .start = 0,
     .channel_id = 2,
-    .end = 300,
+    .end = 1000,
     .delay_time = 50,
     .duration = 1000,
     .is_pwm = true,
+};
+
+struct BlinkParams params4 = {
+    .start = 0,
+    .channel_id = 3,
+    .end = 1000,
+    .delay_time = 100,
+    .duration = 500,
+    .is_pwm = false,
 };
 
 struct BlinkParams params_wave = {
