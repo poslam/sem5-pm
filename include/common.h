@@ -14,8 +14,8 @@ void set_all(int *channels, int size, int value)
 {
     for (int i = 0; i < size; i++)
     {
-        pwm_set_duty(value, channels[i]);
         delay(50);
+        pwm_set_duty(value, channels[i]);
     }
     pwm_start();
 }

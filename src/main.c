@@ -74,6 +74,7 @@ void button_daemon()
 
                 set_all((int[]){0, 1, 2, 3}, 4, 0);
             }
+            
             else if (time_diff > time_to_long_pressed)
                 button_up_long();
 
@@ -138,13 +139,4 @@ void user_init(void)
 
     xTaskCreate(&button_daemon, "button_daemon", 256, NULL, 1, NULL);
     xTaskCreate(&blink_daemon, "blink_daemon", 1024, NULL, 2, NULL);
-
-    // int channel_id = 0;
-
-    // while (1)
-    // {
-    //     params_wave.channel_id = channel_id;
-    //     blink_pwm(&params_wave);
-    //     channel_id = (channel_id + 1) % 4;
-    // }
 }
